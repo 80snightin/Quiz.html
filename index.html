@@ -1,177 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Instant 80s Night – Personality Quizzes</title>
-<meta name="description" content="Two zero-prep 1980s-themed personality quizzes with a retro UI.">
-<style>
-  :root{
-    --bg:#0a0f1e;
-    --grid:#182445;
-    --neon1:#00f5ff;
-    --neon2:#ff2bd6;
-    --neon3:#ffe600;
-    --ink:#e8f0ff;
-    --muted:#9bb0d3;
-    --btn:#101a35;
-    --btnHover:#1a2a59;
-    --accent:#3bf7ff;
-    --danger:#ff6b6b;
-    --good:#2ee6a6;
-    --focus:#93e2ff;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0; background: radial-gradient(1200px 600px at 50% 120%, rgba(0,245,255,0.15), transparent 60%),
-                     radial-gradient(800px 500px at 20% 10%, rgba(255,43,214,0.15), transparent 60%),
-                     var(--bg);
-    color:var(--ink); font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, sans-serif;
-    overflow-x:hidden;
-  }
-  body::before{
-    content:""; pointer-events:none; position:fixed; inset:0;
-    background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.03), rgba(255,255,255,0.03) 1px, transparent 2px, transparent 4px);
-    mix-blend-mode: overlay; opacity:.25;
-  }
-  .grid{
-    position:fixed; inset:auto 0 0 0; height:45vh; transform: perspective(600px) rotateX(60deg);
-    background:
-      linear-gradient(to right, transparent 49%, rgba(255,255,255,0.08) 50%, transparent 51%) 0 0 / 60px 100%,
-      linear-gradient(to bottom, transparent 49%, rgba(255,255,255,0.08) 50%, transparent 51%) 0 0 / 100% 60px;
-    box-shadow: 0 -10px 80px rgba(0,245,255,0.2) inset;
-    border-top:1px solid rgba(255,255,255,0.12);
-    filter: drop-shadow(0 -6px 12px rgba(0,245,255,0.25));
-    opacity:.6;
-  }
-  header{position:relative; padding:28px 20px 10px; text-align:center;}
-  h1{
-    margin:0; letter-spacing:0.03em; font-weight:800; font-size: clamp(1.4rem, 2.5vw, 2rem);
-    text-shadow: 0 0 12px var(--neon1), 0 0 28px var(--neon2);
-  }
-  .sub{margin-top:6px; color:var(--muted); font-size:.95rem;}
-  .shell{max-width:980px; margin:24px auto 120px; padding:16px;}
-  .card{
-    background: rgba(16,26,53,0.6);
-    border:1px solid rgba(147,226,255,0.25);
-    border-radius:14px; padding:18px;
-    box-shadow: 0 0 24px rgba(59,247,255,0.08), 0 0 80px rgba(255,43,214,0.08) inset;
-    backdrop-filter: blur(6px);
-  }
-  .row{display:grid; gap:14px}
-  @media(min-width:900px){ .row{grid-template-columns: 1.2fr 1fr;} }
-  .selectQuiz .tile{
-    display:flex; flex-direction:column; gap:8px; padding:14px; border-radius:10px; cursor:pointer;
-    background: linear-gradient(135deg, rgba(0,245,255,0.08), rgba(255,43,214,0.06));
-    border:1px solid rgba(147,226,255,0.2);
-    transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
-  }
-  .selectQuiz .tile:hover{ transform: translateY(-2px); border-color: rgba(255,230,0,0.5); box-shadow: 0 0 18px rgba(255,230,0,0.18) }
-  .badge{display:inline-flex; align-items:center; gap:6px; font-size:.8rem;
-    padding:4px 8px; border-radius:20px; border:1px solid rgba(147,226,255,0.25); color:var(--muted)}
-  .question{font-weight:700; font-size:1.15rem; margin:2px 0 12px; letter-spacing:.01em;
-    text-shadow: 0 0 10px rgba(59,247,255,0.25);}
-  .answers{display:grid; gap:10px}
-  .btn{
-    border:1px solid rgba(147,226,255,0.35); background:var(--btn); color:var(--ink);
-    padding:12px 14px; border-radius:12px; cursor:pointer;
-    transition: transform .06s ease, box-shadow .12s ease, border-color .12s;
-    text-align:left; width:100%;
-  }
-  .btn:hover{ border-color: var(--accent); box-shadow: 0 0 18px rgba(59,247,255,0.2); transform: translateY(-1px) }
-  .btn:focus{ outline:2px solid var(--focus); outline-offset:2px }
-  .toolbar{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:14px}
-  .toolbar .small{font-size:.9rem; color:var(--muted)}
-  .navbtn{
-    background: linear-gradient(180deg, rgba(0,245,255,0.15), rgba(0,245,255,0.05));
-    border:1px solid rgba(147,226,255,0.35);
-    padding:10px 12px; border-radius:10px; cursor:pointer; color:var(--ink);
-  }
-  .navbtn:hover{ border-color:var(--neon3); box-shadow: 0 0 14px rgba(255,230,0,0.2) }
-  .navbtn[disabled]{ opacity:.5; cursor:not-allowed }
-  .progress{height:8px; border-radius:6px; background:rgba(147,226,255,0.15); overflow:hidden; margin:10px 0 2px;}
-  .progress > b{display:block; height:100%; width:0%;
-    background: linear-gradient(90deg, var(--neon1), var(--neon2), var(--neon3));
-    box-shadow: 0 0 10px rgba(59,247,255,0.35);}
-  .result{display:grid; gap:10px;}
-  .result h2{margin:.2rem 0; font-size:1.4rem; text-shadow: 0 0 10px rgba(255,43,214,0.4);}
-  .pill{display:inline-block; padding:6px 10px; border:1px solid rgba(147,226,255,0.35); border-radius:999px; font-size:.85rem; color:var(--muted);}
-  .callout{border-left:3px solid var(--accent); padding:8px 12px; background:rgba(0,245,255,0.06); border-radius:8px;}
-  footer{text-align:center; color:var(--muted); font-size:.85rem; padding:30px 16px 80px;}
-  .cursor{position:fixed; width:16px; height:16px; border-radius:50%;
-    background: radial-gradient(circle at 30% 30%, rgba(255,230,0,0.9), rgba(255,230,0,0.2) 60%, transparent 70%);
-    pointer-events:none; mix-blend-mode: screen; opacity:.7; transform: translate(-50%,-50%);
-    transition: transform .03s linear;}
-</style>
+  <meta charset="UTF-8">
+  <title>Instant 80s Night – Personality Quiz</title>
+  <style>
+    body {
+      background: radial-gradient(circle at top, #120033, #000000);
+      color: #fff;
+      font-family: 'Courier New', Courier, monospace;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      margin-top: 40px;
+      font-size: 28px;
+      color: #7CFCFF;
+      text-shadow: 0 0 10px #00fff2, 0 0 20px #00fff2;
+    }
+    .quiz-container {
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+      background: rgba(0,0,0,0.6);
+      border-radius: 12px;
+      box-shadow: 0 0 20px #00fff2;
+    }
+    .question {
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    button {
+      padding: 12px;
+      font-size: 18px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      background: #111;
+      color: #fff;
+      transition: background 0.3s, transform 0.2s;
+      box-shadow: 0 0 10px #00fff2;
+    }
+    button:hover {
+      background: #00fff2;
+      color: #000;
+      transform: scale(1.05);
+    }
+    .result {
+      font-size: 24px;
+      margin-top: 30px;
+      color: #FFD700;
+      text-shadow: 0 0 10px #FFD700, 0 0 20px #FFA500;
+    }
+  </style>
 </head>
 <body>
-<div class="grid" aria-hidden="true"></div>
-<div class="cursor" aria-hidden="true"></div>
-<header>
-  <h1>Instant 80s Night – Personality Quizzes</h1>
-  <div class="sub">Zero-prep, screen-only, retro fun. Use ← → to navigate, 1–4 to answer.</div>
-</header>
-<main class="shell">
-  <section class="card" id="app"></section>
-</main>
-<footer>Built for spontaneous nights in. No props, no printing — just vibes.</footer>
+  <h1>Instant 80s Night – Personality Quiz</h1>
+  <div class="quiz-container">
+    <div id="quiz"></div>
+    <div id="result" class="result"></div>
+  </div>
 
-<script>
-const QUIZZES = [
-  {
-    id: "movie-archetype",
-    title: "Which 80s Movie Archetype Are You?",
-    blurb: "From neon-lit street chases to after-school detentions — find your vibe.",
-    questions: [
-      { q:"A problem lands in your lap. First move?",
-        a:[{t:"Act now, fix details later.",m:"maverick"},{t:"Map it, step by step.",m:"brain"},{t:"Observe, then choose a smart angle.",m:"outsider"},{t:"Talk to people and rally support.",m:"charmer"}]},
-      { q:"Your perfect 80s backdrop?",
-        a:[{t:"Rain-soaked city at night.",m:"maverick"},{t:"Locker hallway with echoes.",m:"brain"},{t:"Quiet suburb with secrets.",m:"outsider"},{t:"Bustling arcade on a Friday.",m:"charmer"}]},
-      { q:"Tech shows up. You…",
-        a:[{t:"Use it as a tool, not a crutch.",m:"maverick"},{t:"Prototype something clever.",m:"visionary"},{t:"Break it down to understand it.",m:"brain"},{t:"Ask what it can do for people.",m:"charmer"}]},
-      { q:"Conflict style?",
-        a:[{t:"Head-on, no hesitation.",m:"maverick"},{t:"Out-think them.",m:"brain"},{t:"Side-step and surprise.",m:"outsider"},{t:"Charm your way through.",m:"charmer"}]},
-      { q:"Weekend plan:",
-        a:[{t:"Road trip, windows down.",m:"maverick"},{t:"Deep dive into a curiosity.",m:"brain"},{t:"Sketch, write, or tinker solo.",m:"outsider"},{t:"Friends, music, and people-watching.",m:"charmer"}]},
-      { q:"Group role without trying:",
-        a:[{t:"The catalyst.",m:"maverick"},{t:"The strategist.",m:"brain"},{t:"The wildcard.",m:"outsider"},{t:"The connector.",m:"charmer"}]},
-      { q:"Soundtrack energy:",
-        a:[{t:"Synths with a heartbeat.",m:"visionary"},{t:"Guitar riffs that punch.",m:"maverick"},{t:"Melodies that linger.",m:"outsider"},{t:"Hooks everyone hums.",m:"charmer"}]},
-      { q:"Pick a prop:",
-        a:[{t:"Leather jacket.",m:"maverick"},{t:"Notebook full of diagrams.",m:"brain"},{t:"Cassette with unknown band.",m:"outsider"},{t:"Polished smile and a plan.",m:"charmer"}]}
-    ],
-    outcomes: {
-      maverick:{title:"The Maverick",color:"#ff6b6b",text:"Decisive, high-tempo, allergic to waiting. You turn problems into set pieces and make your own exits."},
-      brain:{title:"The Brain",color:"#93e2ff",text:"Patterns first, noise later. You architect outcomes and rarely play a move you haven’t considered twice."},
-      outsider:{title:"The Outsider",color:"#b5ffa8",text:"Quiet edge, sharp read. You notice the hinge moments and tip them with style."},
-      charmer:{title:"The Charmer",color:"#ffd28a",text:"Social radar on point. You stitch people together and open doors with conversation."},
-      visionary:{title:"The Visionary",color:"#a98bff",text:"Future-leaning and curious. You see systems, remix them, and make tomorrow show up early."}
-    }
-  },
-  {
-    id:"music-subculture",
-    title:"Which 80s Music Subculture Fits You?",
-    blurb:"Scene energy without the costume changes.",
-    questions:[
-      {q:"Pick a venue for tonight:",a:[{t:"Intimate club, angular melodies.",m:"newwave"},{t:"Stadium with lighters in the air.",m:"arena"},{t:"Block party with open mics.",m:"hiphop"},{t:"Sticky-floor venue with shredding solos.",m:"metal"}]},
-      {q:"Your baseline mood:",a:[{t:"Wry, minimalist, slightly detached.",m:"newwave"},{t:"Earnest and massive.",m:"arena"},{t:"Inventive and direct.",m:"hiphop"},{t:"Intense and technical.",m:"metal"}]},
-      {q:"A song hook should…",a:[{t:"Creep in and stay.",m:"synthpop"},{t:"Lift a crowd at once.",m:"arena"},{t:"Flip words on the beat.",m:"hiphop"},{t:"Outrun the drummer.",m:"metal"}]},
-      {q:"Uniform for the night:",a:[{t:"Monochrome with one sharp accent.",m:"newwave"},{t:"Denim + confidence.",m:"arena"},{t:"Clean kicks, cap, movement-ready.",m:"hiphop"},{t:"Black tee and a wrist cramp.",m:"metal"}]},
-      {q:"Your relationship with machines:",a:[{t:"We collaborate quietly.",m:"synthpop"},{t:"They push the chorus higher.",m:"arena"},{t:"They’re instruments, not masters.",m:"hiphop"},{t:"Keep up or get out-riffed.",m:"metal"}]},
-      {q:"Ideal night’s arc:",a:[{t:"Cool start → sharp finish.",m:"newwave"},{t:"Steady build → communal release.",m:"arena"},{t:"Freestyle sparks → inside jokes.",m:"hiphop"},{t:"Fast → faster.",m:"metal"}]},
-      {q:"Pick a lyric philosophy:",a:[{t:"Side-eye poetry.",m:"newwave"},{t:"Big feelings, no smirk.",m:"arena"},{t:"Wordplay with purpose.",m:"hiphop"},{t:"Precision as attitude.",m:"metal"}]},
-      {q:"When the lights come up, you want to feel…",a:[{t:"Unbothered and understood.",m:"newwave"},{t:"Wrung out and smiling.",m:"arena"},{t:"Charged and connected.",m:"hiphop"},{t:"Tested and alive.",m:"metal"}]}
-    ],
-    outcomes:{
-      newwave:{title:"New Wave Minimalist",color:"#6df0ff",text:"Angular grooves, arched eyebrow. You choose sleek over loud and say more with less."},
-      arena:{title:"Arena Anthem Belter",color:"#ffe066",text:"Chorus-first, crowd-sized feelings. You measure songs by lift-off altitude."},
-      hiphop:{title:"Hip-Hop Pioneer",color:"#88ffa3",text:"Rhythm as blueprint, voice as instrument. You’re here for invention and connection."},
-      metal:{title:"Metalhead Virtuoso",color:"#c9b6ff",text:"Tempo as truth, craft as creed. You appreciate speed, skill, and grit."},
-      synthpop:{title:"Synth-Pop Daydreamer",color:"#ff93e1",text:"Soft focus, bright hooks. You like your emotions in neon gradients."}
-    }
-  }
-];
+  <script>
+    const quizData = [
+      {
+        question: "It’s Friday night in 1986. Where are you headed?",
+        options: ["Roller disco", "Arcade", "Concert", "Chilling with friends"],
+        scores: ["R", "A", "C", "D"]
+      },
+      {
+        question: "Pick your ultimate 80s accessory:",
+        options: ["Walkman", "Cassette tapes", "Joystick", "Polaroid camera"],
+        scores: ["R", "C", "A", "D"]
+      },
+      {
+        question: "Your theme song drops. What is it?",
+        options: ["‘Girls Just Wanna Have Fun’", "‘Take On Me’", "‘Eye of the Tiger’", "‘Sweet Dreams’"],
+        scores: ["R", "C", "A", "D"]
+      },
+      {
+        question: "Which snack fuels your 80s adventure?",
+        options: ["Slushie", "Bubblegum", "Popcorn", "Pizza"],
+        scores: ["R", "C", "A", "D"]
+      },
+      {
+        question: "You get one gadget from the 80s. Which one?",
+        options: ["Boom box", "Camcorder", "NES console", "Record player"],
+        scores: ["R", "D", "A", "C"]
+      },
+      {
+        question: "Choose your dream 80s hangout:",
+        options: ["Roller rink", "Basement with VHS tapes", "Mall arcade", "Record store"],
+        scores: ["R", "D", "A", "C"]
+      },
+      {
+        question: "What’s your 80s outfit of choice?",
+        options: ["Leg warmers + neon", "Denim jacket + pins", "Graphic tee + sneakers", "All black + shades"],
+        scores: ["R", "C", "A", "D"]
+      },
+      {
+        question: "Your ideal Saturday morning looks like:",
+        options: ["Cartoons + cereal", "Mix tapes + doodling", "Video games till noon", "Sleeping in with music"],
+        scores: ["R", "C", "A", "D"]
+      }
+    ];
 
-// same App code as your original (kept intact)...
-// [keeping App, glow cursor, init — unchanged from your provided code]
+    const results = {
+      R: "🎶 You are Rollerskate Ricky/Ruby! Life’s a party, and you bring the neon sparkle wherever you go.",
+      C: "📼 You are Cassette Casey! Sentimental, creative, and always making the perfect playlist.",
+      A: "🕹️ You are Arcade Alex! Competitive, fun-loving, and the champion of high scores.",
+      D: "🌙 You are Dreamer Dana! Chill, thoughtful, and living life with 80s vibes on your own terms."
+    };
+
+    let currentQuestion = 0;
+    let scores = {R:0, C:0, A:0, D:0};
+
+    const quizEl = document.getElementById("quiz");
+    const resultEl = document.getElementById("result");
+
+    function loadQuestion() {
+      if (currentQuestion < quizData.length) {
+        const q = quizData[currentQuestion];
+        quizEl.innerHTML = `
+          <div class="question">${q.question}</div>
+          <div class="options">
+            ${q.options.map((opt, i) => `<button onclick="selectOption('${q.scores[i]}')">${opt}</button>`).join("")}
+          </div>
+        `;
+      } else {
+        showResult();
+      }
+    }
+
+    function selectOption(score) {
+      scores[score]++;
+      currentQuestion++;
+      loadQuestion();
+    }
+
+    function showResult() {
+      let maxScore = 0;
+      let personality = "";
+      for (let key in scores) {
+        if (scores[key] > maxScore) {
+          maxScore = scores[key];
+          personality = key;
+        }
+      }
+      quizEl.innerHTML = "";
+      resultEl.innerHTML = results[personality];
+    }
+
+    loadQuestion();
+  </script>
+</body>
+</html>
