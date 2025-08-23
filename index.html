@@ -1,158 +1,415 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Instant 80s Night - Riddle Challenge</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Instant 80s Night – Personality Quizzes</title>
+<meta name="description" content="Two zero-prep 1980s-themed personality quizzes with a retro UI.">
+<style>
+  :root{
+    --bg:#0a0f1e;
+    --grid:#182445;
+    --neon1:#00f5ff;
+    --neon2:#ff2bd6;
+    --neon3:#ffe600;
+    --ink:#e8f0ff;
+    --muted:#9bb0d3;
+    --btn:#101a35;
+    --btnHover:#1a2a59;
+    --accent:#3bf7ff;
+    --danger:#ff6b6b;
+    --good:#2ee6a6;
+    --focus:#93e2ff;
+  }
 
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-      width: 100vw;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: radial-gradient(circle at center, #0d001a, #000);
-      font-family: 'Orbitron', sans-serif;
-      color: #fff;
-    }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background: radial-gradient(1200px 600px at 50% 120%, rgba(0,245,255,0.15), transparent 60%),
+                     radial-gradient(800px 500px at 20% 10%, rgba(255,43,214,0.15), transparent 60%),
+                     var(--bg);
+    color:var(--ink); font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, sans-serif;
+    overflow-x:hidden;
+  }
 
-    .quiz-container {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 20px;
-    }
+  body::before{
+    content:""; pointer-events:none; position:fixed; inset:0;
+    background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.03), rgba(255,255,255,0.03) 1px, transparent 2px, transparent 4px);
+    mix-blend-mode: overlay; opacity:.25;
+  }
 
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 20px;
-      text-shadow: 0 0 15px cyan;
-    }
+  .grid{
+    position:fixed; inset:auto 0 0 0; height:45vh; transform: perspective(600px) rotateX(60deg);
+    background:
+      linear-gradient(to right, transparent 49%, rgba(255,255,255,0.08) 50%, transparent 51%) 0 0 / 60px 100%,
+      linear-gradient(to bottom, transparent 49%, rgba(255,255,255,0.08) 50%, transparent 51%) 0 0 / 100% 60px;
+    box-shadow: 0 -10px 80px rgba(0,245,255,0.2) inset;
+    border-top:1px solid rgba(255,255,255,0.12);
+    filter: drop-shadow(0 -6px 12px rgba(0,245,255,0.25));
+    opacity:.6;
+  }
 
-    .question {
-      font-size: 1.2rem;
-      margin-bottom: 30px;
-      max-width: 700px;
-    }
+  header{
+    position:relative; padding:28px 20px 10px; text-align:center;
+  }
+  h1{
+    margin:0; letter-spacing:0.03em; font-weight:800; font-size: clamp(1.4rem, 2.5vw, 2rem);
+    text-shadow: 0 0 12px var(--neon1), 0 0 28px var(--neon2);
+  }
+  .sub{
+    margin-top:6px; color:var(--muted); font-size:.95rem;
+  }
 
-    .options {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      width: 100%;
-      max-width: 400px;
-    }
+  .shell{
+    max-width:980px; margin:24px auto 120px; padding:16px;
+  }
+  .card{
+    background: rgba(16,26,53,0.6);
+    border:1px solid rgba(147,226,255,0.25);
+    border-radius:14px; padding:18px;
+    box-shadow: 0 0 24px rgba(59,247,255,0.08), 0 0 80px rgba(255,43,214,0.08) inset;
+    backdrop-filter: blur(6px);
+  }
 
-    .options button {
-      padding: 15px;
-      font-size: 1rem;
-      border: none;
-      border-radius: 8px;
-      background: #111;
-      color: #fff;
-      cursor: pointer;
-      box-shadow: 0 0 10px cyan;
-      transition: 0.2s;
-    }
+  .row{display:grid; gap:14px}
+  @media(min-width:900px){ .row{grid-template-columns: 1.2fr 1fr;} }
 
-    .options button:hover {
-      background: cyan;
-      color: black;
-    }
+  .selectQuiz .tile{
+    display:flex; flex-direction:column; gap:8px; padding:14px; border-radius:10px; cursor:pointer;
+    background: linear-gradient(135deg, rgba(0,245,255,0.08), rgba(255,43,214,0.06));
+    border:1px solid rgba(147,226,255,0.2);
+    transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  }
+  .selectQuiz .tile:hover{ transform: translateY(-2px); border-color: rgba(255,230,0,0.5); box-shadow: 0 0 18px rgba(255,230,0,0.18) }
+  .badge{
+    display:inline-flex; align-items:center; gap:6px; font-size:.8rem;
+    padding:4px 8px; border-radius:20px; border:1px solid rgba(147,226,255,0.25); color:var(--muted)
+  }
 
-    #result {
-      margin-top: 20px;
-      font-size: 1.4rem;
-      text-shadow: 0 0 10px lime;
-    }
-  </style>
+  .question{
+    font-weight:700; font-size:1.15rem; margin:2px 0 12px; letter-spacing:.01em;
+    text-shadow: 0 0 10px rgba(59,247,255,0.25);
+  }
+
+  .answers{display:grid; gap:10px}
+  .btn{
+    border:1px solid rgba(147,226,255,0.35); background:var(--btn); color:var(--ink);
+    padding:12px 14px; border-radius:12px; cursor:pointer;
+    box-shadow: 0 0 0 0 rgba(0,0,0,0);
+    transition: transform .06s ease, box-shadow .12s ease, border-color .12s;
+    text-align:left; width:100%;
+  }
+  .btn:hover{ border-color: var(--accent); box-shadow: 0 0 18px rgba(59,247,255,0.2); transform: translateY(-1px) }
+  .btn:focus{ outline:2px solid var(--focus); outline-offset:2px }
+
+  .toolbar{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:14px}
+  .toolbar .small{font-size:.9rem; color:var(--muted)}
+  .navbtn{
+    background: linear-gradient(180deg, rgba(0,245,255,0.15), rgba(0,245,255,0.05));
+    border:1px solid rgba(147,226,255,0.35);
+    padding:10px 12px; border-radius:10px; cursor:pointer; color:var(--ink);
+  }
+  .navbtn:hover{ border-color:var(--neon3); box-shadow: 0 0 14px rgba(255,230,0,0.2) }
+  .navbtn[disabled]{ opacity:.5; cursor:not-allowed }
+
+  .progress{
+    height:8px; border-radius:6px; background:rgba(147,226,255,0.15); overflow:hidden; margin:10px 0 2px;
+  }
+  .progress > b{
+    display:block; height:100%; width:0%;
+    background: linear-gradient(90deg, var(--neon1), var(--neon2), var(--neon3));
+    box-shadow: 0 0 10px rgba(59,247,255,0.35);
+  }
+
+  .result{
+    display:grid; gap:10px;
+  }
+  .result h2{
+    margin:.2rem 0; font-size:1.4rem;
+    text-shadow: 0 0 10px rgba(255,43,214,0.4);
+  }
+  .pill{
+    display:inline-block; padding:6px 10px; border:1px solid rgba(147,226,255,0.35); border-radius:999px; font-size:.85rem; color:var(--muted);
+  }
+  .callout{
+    border-left:3px solid var(--accent); padding:8px 12px; background:rgba(0,245,255,0.06); border-radius:8px;
+  }
+
+  footer{
+    text-align:center; color:var(--muted); font-size:.85rem; padding:30px 16px 80px;
+  }
+
+  .cursor{
+    position:fixed; width:16px; height:16px; border-radius:50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,230,0,0.9), rgba(255,230,0,0.2) 60%, transparent 70%);
+    pointer-events:none; mix-blend-mode: screen; opacity:.7; transform: translate(-50%,-50%);
+    transition: transform .03s linear;
+  }
+</style>
 </head>
 <body>
-  <div class="quiz-container">
-    <h1>Instant 80s Night - Riddle Challenge</h1>
-    <div id="quiz"></div>
-    <div id="result"></div>
-  </div>
+<div class="grid" aria-hidden="true"></div>
+<div class="cursor" aria-hidden="true"></div>
 
-  <script>
-    const questions = [
-      {
-        question: "I’m taken from a mine, locked in a wooden case. I’m never released, yet almost every student uses me. What am I?",
-        answers: ["A pencil", "A lock", "A coin", "A clock"],
-        correct: 0
-      },
-      {
-        question: "The more you take from me, the bigger I get. I can swallow whole cities, yet I start so small. What am I?",
-        answers: ["A hole", "A shadow", "A fire", "A storm"],
-        correct: 0
-      },
-      {
-        question: "I move without legs, whisper without a mouth, and I can shake mighty mountains. What am I?",
-        answers: ["An echo", "The wind", "An earthquake", "A river"],
-        correct: 1
-      },
-      {
-        question: "The rich need me, the poor have me, and if you eat me, you will surely die. What am I?",
-        answers: ["Nothing", "Gold", "Pride", "Silence"],
-        correct: 0
-      },
-      {
-        question: "I can fly without wings. I can cry without eyes. Wherever I go, darkness follows me. What am I?",
-        answers: ["A cloud", "A comet", "The wind", "Smoke"],
-        correct: 0
-      },
-      {
-        question: "The more you share me, the less I become. I vanish the moment I’m spoken aloud. What am I?",
-        answers: ["A secret", "A promise", "A lie", "A whisper"],
-        correct: 0
-      },
-      {
-        question: "I’m always running, but I have no legs. You can never stop me, but you always feel me. What am I?",
-        answers: ["Time", "Water", "The wind", "Your heartbeat"],
-        correct: 0
-      }
-    ];
+<header>
+  <h1>Instant 80s Night – Personality Quizzes</h1>
+  <div class="sub">Zero-prep, screen-only, retro fun. Use ← → to navigate, 1–4 to answer.</div>
+</header>
 
-    let currentQuestion = 0;
-    let score = 0;
+<main class="shell">
+  <section class="card" id="app">
+    <!-- App injected here -->
+  </section>
+</main>
 
-    const quizContainer = document.getElementById("quiz");
-    const resultContainer = document.getElementById("result");
+<footer>
+  Built for spontaneous nights in. No props, no printing — just vibes.
+</footer>
 
-    function showQuestion() {
-      if (currentQuestion < questions.length) {
-        let q = questions[currentQuestion];
-        quizContainer.innerHTML = `
-          <div class="question">${q.question}</div>
-          <div class="options">
-            ${q.answers.map((ans, i) =>
-              `<button onclick="checkAnswer(${i})">${ans}</button>`
-            ).join("")}
-          </div>
-        `;
-      } else {
-        quizContainer.innerHTML = "";
-        resultContainer.innerHTML = `You solved ${score} out of ${questions.length} riddles!`;
+<script>
+const QUIZZES = [
+  {
+    id: "movie-archetype",
+    title: "Which 80s Movie Archetype Are You?",
+    blurb: "From neon-lit street chases to after-school detentions — find your vibe.",
+    questions: [
+      {q:"A problem lands in your lap. First move?", a:[
+        {t:"Act now, fix details later.", m:"maverick"},
+        {t:"Map it, step by step.", m:"brain"},
+        {t:"Observe, then choose a smart angle.", m:"outsider"},
+        {t:"Talk to people and rally support.", m:"charmer"}
+      ]},
+      {q:"Your perfect 80s backdrop?", a:[
+        {t:"Rain-soaked city at night.", m:"maverick"},
+        {t:"Locker hallway with echoes.", m:"brain"},
+        {t:"Quiet suburb with secrets.", m:"outsider"},
+        {t:"Bustling arcade on a Friday.", m:"charmer"}
+      ]},
+      {q:"Tech shows up. You…", a:[
+        {t:"Use it as a tool, not a crutch.", m:"maverick"},
+        {t:"Prototype something clever.", m:"visionary"},
+        {t:"Break it down to understand it.", m:"brain"},
+        {t:"Ask what it can do for people.", m:"charmer"}
+      ]},
+      {q:"Conflict style?", a:[
+        {t:"Head-on, no hesitation.", m:"maverick"},
+        {t:"Out-think them.", m:"brain"},
+        {t:"Side-step and surprise.", m:"outsider"},
+        {t:"Charm your way through.", m:"charmer"}
+      ]},
+      {q:"Weekend plan:", a:[
+        {t:"Road trip, windows down.", m:"maverick"},
+        {t:"Deep dive into a curiosity.", m:"brain"},
+        {t:"Sketch, write, or tinker solo.", m:"outsider"},
+        {t:"Friends, music, and people-watching.", m:"charmer"}
+      ]},
+      {q:"Group role without trying:", a:[
+        {t:"The catalyst.", m:"maverick"},
+        {t:"The strategist.", m:"brain"},
+        {t:"The wildcard.", m:"outsider"},
+        {t:"The connector.", m:"charmer"}
+      ]},
+      {q:"Soundtrack energy:", a:[
+        {t:"Synths with a heartbeat.", m:"visionary"},
+        {t:"Guitar riffs that punch.", m:"maverick"},
+        {t:"Melodies that linger.", m:"outsider"},
+        {t:"Hooks everyone hums.", m:"charmer"}
+      ]},
+      {q:"Pick a prop:", a:[
+        {t:"Leather jacket.", m:"maverick"},
+        {t:"Notebook full of diagrams.", m:"brain"},
+        {t:"Cassette with unknown band.", m:"outsider"},
+        {t:"Polished smile and a plan.", m:"charmer"}
+      ]}
+    ],
+    outcomes:{
+      maverick:{title:"Alex – The Trailblazer",color:"#ff6b6b",text:"Alex leaps into challenges headfirst. Bold and fearless, they turn obstacles into opportunities and inspire others to take the leap too."},
+      brain:{title:"Jordan – The Strategist",color:"#93e2ff",text:"Jordan sees the patterns others miss. Thoughtful, clever, and methodical, they plan carefully and make every move count."},
+      outsider:{title:"Riley – The Observer",color:"#b5ffa8",text:"Riley notices the details everyone overlooks. Quiet, insightful, and a bit mysterious, they have a knack for showing up exactly where they’re needed."},
+      charmer:{title:"Sam – The Connector",color:"#ffd28a",text:"Sam lights up every room they enter. Social, empathetic, and magnetic, they bring people together effortlessly and make friends wherever they go."},
+      visionary:{title:"Taylor – The Visionary",color:"#a98bff",text:"Taylor dreams big and acts bigger. Creative, curious, and future-focused, they see possibilities that others can’t imagine and make them real."}
+    }
+  },
+  {
+    id: "music-subculture",
+    title: "Which 80s Music Subculture Fits You?",
+    blurb: "Scene energy without the costume changes.",
+    questions:[
+      {q:"Pick a venue for tonight:",a:[
+        {t:"Intimate club, angular melodies.", m:"newwave"},
+        {t:"Stadium with lighters in the air.", m:"arena"},
+        {t:"Block party with open mics.", m:"hiphop"},
+        {t:"Sticky-floor venue with shredding solos.", m:"metal"}
+      ]},
+      {q:"Your baseline mood:",a:[
+        {t:"Wry, minimalist, slightly detached.", m:"newwave"},
+        {t:"Earnest and massive.", m:"arena"},
+        {t:"Inventive and direct.", m:"hiphop"},
+        {t:"Intense and technical.", m:"metal"}
+      ]},
+      {q:"A song hook should…",a:[
+        {t:"Creep in and stay.", m:"synthpop"},
+        {t:"Lift a crowd at once.", m:"arena"},
+        {t:"Flip words on the beat.", m:"hiphop"},
+        {t:"Outrun the drummer.", m:"metal"}
+      ]},
+      {q:"Uniform for the night:",a:[
+        {t:"Monochrome with one sharp accent.", m:"newwave"},
+        {t:"Denim + confidence.", m:"arena"},
+        {t:"Clean kicks, cap, movement-ready.", m:"hiphop"},
+        {t:"Black tee and a wrist cramp.", m:"metal"}
+      ]},
+      {q:"Your relationship with machines:",a:[
+        {t:"We collaborate quietly.", m:"synthpop"},
+        {t:"They push the chorus higher.", m:"arena"},
+        {t:"They’re instruments, not masters.", m:"hiphop"},
+        {t:"Keep up or get out-riffed.", m:"metal"}
+      ]},
+      {q:"Ideal night’s arc:",a:[
+        {t:"Cool start → sharp finish.", m:"newwave"},
+        {t:"Steady build → communal release.", m:"arena"},
+        {t:"Freestyle sparks → inside jokes.", m:"hiphop"},
+        {t:"Fast → faster.", m:"metal"}
+      ]},
+      {q:"Pick a lyric philosophy:",a:[
+        {t:"Side-eye poetry.", m:"newwave"},
+        {t:"Big feelings, no smirk.", m:"arena"},
+        {t:"Wordplay with purpose.", m:"hiphop"},
+        {t:"Precision as attitude.", m:"metal"}
+      ]},
+      {q:"When the lights come up, you want to feel…",a:[
+        {t:"Unbothered and understood.", m:"newwave"},
+        {t:"Wrung out and smiling.", m:"arena"},
+        {t:"Charged and connected.", m:"hiphop"},
+        {t:"Tested and alive.", m:"metal"}
+      ]}
+    ],
+    outcomes:{
+      newwave:{title:"Casey – The Cool Minimalist",color:"#6df0ff",text:"Casey has a keen sense for style and simplicity. Thoughtful and subtle, they make a strong impression without ever needing to shout."},
+      arena:{title:"Jordan – The Crowd-Mover",color:"#ffe066",text:"Jordan thrives in energy-filled moments. Outgoing, bold, and expressive, they bring life to any gathering and make experiences unforgettable."},
+      hiphop:{title:"Riley – The Innovator",color:"#88ffa3",text:"Riley creates rhythm and movement in every aspect of life. Inventive, confident, and original, they inspire others with their ideas and energy."},
+      metal:{title:"Alex – The Intense Virtuoso",color:"#c9b6ff",text:"Alex dives into their passions with unmatched focus. Bold, driven, and skilled, they tackle challenges with energy and precision."},
+      synthpop:{title:"Sam – The Dreamer",color:"#ff93e1",text:"Sam sees the world in bright gradients. Imaginative, thoughtful, and whimsical, they bring a sense of wonder wherever they go."}
+    }
+  }
+];
+
+/* ---------------- APP STATE & LOGIC ---------------- */
+const $ = (sel, root=document) => root.querySelector(sel);
+const $$= (sel, root=document) => [...root.querySelectorAll(sel)];
+
+const App = {
+  state: {quizIndex:null,i:0,scores:{}},
+  init(){
+    const hash = new URLSearchParams(location.hash.slice(1));
+    const quizId = hash.get('q');
+    const step   = parseInt(hash.get('i')||'0',10);
+    const scores = hash.get('s') ? JSON.parse(decodeURIComponent(hash.get('s'))) : null;
+    if(quizId){
+      const qi = QUIZZES.findIndex(q=>q.id===quizId);
+      if(qi>-1){
+        this.state.quizIndex = qi;
+        this.state.i = isFinite(step)?step:0;
+        this.state.scores = scores||{};
+        return this.renderQuiz();
       }
     }
+    this.renderPicker();
+  },
+  renderPicker(){
+    const el=$('#app');
+    el.innerHTML = `<div class="row selectQuiz" role="list">
+      ${QUIZZES.map(q=>`
+        <div class="tile" role="listitem" tabindex="0" aria-label="${q.title}" data-id="${q.id}">
+          <span class="badge">80s • zero-prep</span>
+          <h2 style="margin:.2rem 0">${q.title}</h2>
+          <p style="color:var(--muted); margin:0">${q.blurb}</p>
+        </div>`).join('')}
+    </div>
+    <div class="callout" style="margin-top:12px">
+      Tip: One person shares this screen. Everyone answers by shouting, raising hands, or using 1–4 on their own device.
+    </div>`;
+    $$('.tile',el).forEach(t=>{
+      const id=t.getAttribute('data-id');
+      const go=()=>{this.pickQuiz(id)};
+      t.addEventListener('click',go);
+      t.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}});
+    });
+    this.updateURL();
+  },
+  pickQuiz(id){this.state.quizIndex=QUIZZES.findIndex(q=>q.id===id);this.state.i=0;this.state.scores={};this.renderQuiz();this.updateURL();},
+  current(){return QUIZZES[this.state.quizIndex];},
+  renderQuiz(){
+    const el=$('#app');const qz=this.current();if(!qz){return this.renderPicker();}
+    if(this.state.i>=qz.questions.length){return this.renderResult();}
+    const q=qz.questions[this.state.i];const total=qz.questions.length;
+    el.innerHTML=`<div class="badge">${qz.title}</div>
+      <div class="progress" aria-label="Progress"><b style="width:${(this.state.i/total)*100}%"></b></div>
+      <div class="question">${this.state.i+1}. ${q.q}</div>
+      <div class="answers" role="list">
+        ${q.a.map((opt,idx)=>`
+          <button class="btn" role="listitem" data-m="${opt.m}" data-idx="${idx}" aria-label="Answer ${idx+1}">
+            <strong>${idx+1}.</strong> ${opt.t}
+          </button>`).join('')}
+      </div>
+      <div class="toolbar">
+        <button class="navbtn" id="back" ${this.state.i===0?'disabled':''}>&larr; Back</button>
+        <div class="small">${this.state.i+1} / ${total}</div>
+        <button class="navbtn" id="skip">Skip &rarr;</button>
+      </div>`;
+    $$('.answers .btn',el).forEach(b=>{b.addEventListener('click',()=>this.choose(b.dataset.m));});
+    $('#back',el).addEventListener('click',()=>this.back());
+    $('#skip',el).addEventListener('click',()=>this.skip());
+    document.onkeydown=(e)=>{if(['INPUT','TEXTAREA','SELECT','BUTTON'].includes(document.activeElement.tagName))return;if(e.key>='1'&&e.key<='9'){const idx=parseInt(e.key,10)-1;const btn=$(`.answers .btn[data-idx="${idx}"]`,el);if(btn){btn.click();}}else if(e.key==='ArrowRight'){this.skip();}else if(e.key==='ArrowLeft'){this.back();}};
+    this.updateURL();
+  },
+  choose(mark){this.state.scores[mark]=(this.state.scores[mark]||0)+1;this.state.i++;this.renderQuiz();this.updateURL();},
+  skip(){this.state.i++;this.renderQuiz();this.updateURL();},
+  back(){},
+  renderResult(){
+    const el=$('#app');const qz=this.current();const scores=this.state.scores;
+    const entries=Object.entries(scores);const bestKey=entries.length?entries.sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]))[0][0]:Object.keys(qz.outcomes)[0];
+    const out=qz.outcomes[bestKey];
+    el.innerHTML=`<div class="result">
+      <div class="badge">Result</div>
+      <h2 style="color:${out.color}">${out.title}</h2>
+      <p style="margin:0 0 6px">${out.text}</p>
+      <div class="pill">Quiz: ${qz.title}</div>
+      <div class="toolbar" style="margin-top:12px">
+        <button class="navbtn" id="again">&#8635; Try Again</button>
+        <button class="navbtn" id="share">Copy Result Link</button>
+        <button class="navbtn" id="home">Other Quiz</button>
+      </div>
+    </div>`;
+    $('#again',el).addEventListener('click',()=>{this.state.i=0;this.state.scores={};this.renderQuiz();this.updateURL();});
+    $('#home',el).addEventListener('click',()=>this.renderPicker());
+    $('#share',el).addEventListener('click',()=>this.shareLink());
+    this.updateURL(true);
+  },
+  updateURL(lockResult=false){
+    const qz=this.current();const p=new URLSearchParams();
+    if(qz){p.set('q',qz.id);if(lockResult&&this.state.i>=qz.questions.length){p.set('i',String(this.state.i));p.set('s',encodeURIComponent(JSON.stringify(this.state.scores)));}else{p.set('i',String(this.state.i));}}
+    history.replaceState(null,'','#'+p.toString());
+  },
+  shareLink(){navigator.clipboard.writeText(location.href).then(()=>this.toast("Link copied. Paste to share your result."),()=>this.toast("Couldn’t auto-copy. Select the address bar to copy."));},
+  toast(msg){const t=document.createElement('div');t.textContent=msg;t.style.cssText="position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:rgba(0,0,0,.6);border:1px solid rgba(147,226,255,.4);padding:10px 12px;border-radius:10px;backdrop-filter:blur(6px);z-index:9999";document.body.appendChild(t);setTimeout(()=>t.remove(),2200);}
+};
 
-    function checkAnswer(i) {
-      if (i === questions[currentQuestion].correct) {
-        score++;
-      }
-      currentQuestion++;
-      showQuestion();
-    }
+/* Implement proper back history */
+(function patchBack(){
+  const hist=[];const originalChoose=App.choose.bind(App);
+  App.choose=function(mark){hist.push({i:this.state.i,mark});originalChoose(mark);};
+  App.back=function(){if(this.state.i===0)return;const last=hist.pop();if(last){this.state.i=last.i;if(this.state.scores[last.mark])this.state.scores[last.mark]--;if(this.state.scores[last.mark]===0)delete this.state.scores[last.mark];this.renderQuiz();this.updateURL();}};
+})();
 
-    showQuestion();
-  </script>
+/* Glow cursor */
+(function glowCursor(){
+  const c=$('.cursor');let x=window.innerWidth/2,y=window.innerHeight/2;
+  window.addEventListener('mousemove',e=>{x=e.clientX;y=e.clientY;c.style.transform=`translate(${x}px, ${y}px)`;},{passive:true});
+})();
+
+/* Init app */
+App.init();
+</script>
 </body>
 </html>
